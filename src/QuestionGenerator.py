@@ -15,6 +15,7 @@ if __name__ == '__main__':
         (word, tag) = POS[i]
         if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
             # TODO instead of just using adjacent words, we can try using dependent words from a dependency tree
+            # maybe we can use a wordnet to exchange X and Y for synonyms
             (X, X_pos) = POS[i-1]
             (Y, Y_pos) = POS[i+1]
             if Y_pos == 'JJ': # adjective
@@ -32,8 +33,7 @@ if __name__ == '__main__':
                         # add the questions anyway, if they are bad the scorer should filter them out
                         questions.append("What is " + X + "?")
                         questions.append("What is " + Y + "?")
-        ## TODO add more templates here
-
+        ## TODO add more templates here, create template class
 
     ### Grammar Parser
 

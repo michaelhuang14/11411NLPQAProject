@@ -7,7 +7,6 @@ class StringProcessor:
         return word_tokenize(string)
     # takes in a list of tokens and outputs a list of tuples (token, pos)
     def pos_tag(self, listofstrings):
-
         return nltk.pos_tag(listofstrings)
     # takes in a aword and outputs what NER BERT classifies it as
     def BERT_NER(self, word):

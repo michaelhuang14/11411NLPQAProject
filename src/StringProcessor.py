@@ -17,6 +17,16 @@ def NER(sentence):
     return nltk.ne_chunk(pos_tag(sentence))
 def sentence_tokenize(string):
     return sent_tokenize(string)
+def match_similarity(sent1, sent2):
+    map1 = {}
+    for word in sent1:
+        if word not in map1:
+            map1[word] = 1
+    count = 0
+    for word in sent2:
+        if word in map1:
+            count += 1
+    return count
 
 #sp = StringProcessor()
 if __name__ == "__main__":

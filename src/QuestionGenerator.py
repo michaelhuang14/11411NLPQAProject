@@ -1,5 +1,25 @@
 from StringProcessor import StringProcessor
 from QuestionScorer import QuestionScorer
+import re
+import stanfordnlp
+
+def find_keyword(sentence):
+    relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
+
+    stanfordnlp.download('en')   # This downloads the English models for the neural pipeline
+    nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
+    doc = nlp(sentence)
+    doc.sentences[0].print_dependencies()
+    dependency = doc.sentences[0].dependencies_string()
+    ret = []
+    for line in dependency.split("\n"):
+        # word, index, relation = re.split(r"\".*\"", line)
+        line = line.replace("'", "")
+        word, index, relation = re.findall(r"\((.*), (.*), (.*)\)", line)[0]
+        if relation in relation_list:
+            ret.append((word, relation))
+    return ret
+
 if __name__ == '__main__':
     stringprocessor = StringProcessor()
     questionscorer = QuestionScorer()

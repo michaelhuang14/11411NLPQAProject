@@ -1,5 +1,6 @@
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
+from nltk.chunk import conlltags2tree, tree2conlltags
 import nltk
 nltk.download('punkt')
 nltk.download('maxent_ne_chunker')
@@ -14,7 +15,12 @@ def pos_tag(listofstrings):
     return nltk.pos_tag(listofstrings)
 # takes in a sentence and outputs NER of the sentence
 def NER(sentence):
-    return nltk.ne_chunk(pos_tag(sentence))
+    list = tree2conlltags(nltk.ne_chunk(pos_tag(sentence)))
+    dict = {}
+    for (word, pos, ner) in list:
+        dict[word] = ner
+   # for (word)
+    return dict
 def sentence_tokenize(string):
     return sent_tokenize(string)
 def match_similarity(sent1, sent2):
@@ -30,10 +36,9 @@ def match_similarity(sent1, sent2):
 
 #sp = StringProcessor()
 if __name__ == "__main__":
-    sentence = "Michael Huang is a student at Carnegie Mellon University."
+    sentence = "France is in paris is a student at CMU."
     result = NER(tokenize(sentence))
-    for chunk in result:
-        print(chunk)
+    print(result["France"])
 
 
 

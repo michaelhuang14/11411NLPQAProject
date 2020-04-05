@@ -1,15 +1,15 @@
-from StringProcessor import StringProcessor
+import StringProcessor as sp
 from QuestionScorer import QuestionScorer
 import re
 import stanfordnlp
+#stanfordnlp.download('en')
 
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
 
-    stanfordnlp.download('en')   # This downloads the English models for the neural pipeline
     nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
     doc = nlp(sentence)
-    doc.sentences[0].print_dependencies()
+    #doc.sentences[0].print_dependencies()
     dependency = doc.sentences[0].dependencies_string()
     ret = []
     for line in dependency.split("\n"):
@@ -21,19 +21,29 @@ def find_keyword(sentence):
     return ret
 
 if __name__ == '__main__':
-    stringprocessor = StringProcessor()
-    questionscorer = QuestionScorer()
+    #nquestionscorer = QuestionScorer()
     numQs = 1 # return top 5 questions
     with open('../data/data.txt', 'r') as file:
         data = file.read().replace('\n', ' ')
-    tokens = stringprocessor.tokenize(data)
+    sentences = sp.sent_tokenize(data)
+    # is there a way to trim all extra clauses from a sentence? for exapmle, remove things in between two commas,
+    # remove things after semi-colons, etc.
     # POS key: https://medium.com/@gianpaul.r/tokenization-and-parts-of-speech-pos-tagging-in-pythons-nltk-library-2d30f70af13b
-    POS = stringprocessor.pos_tag(tokens)
     questions = []
     ### Template Matching
-    for i in range(0, len(POS)):
-        (word, tag) = POS[i]
-        if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
+    for i in range(0, len(sentences)):
+        importantwords = find_keyword(sentences[i])
+        ner_tags = sp.NER(sp.tokenize(sentences[i]))
+        sennop = sentences[i][0:len(sentences[i])-1]
+        for (word, pos) in importantwords:
+            if pos == "nsubj":
+                if ner_tags[word] == "B-PERSON":
+                    questions.append(sennop.replace(word, "Who")[0:len()])
+                elif ner_tags[word] == "B-GPE":
+                    questions.append(sennop.replace(word, "Where") + "?")
+                else:
+                    questions.append(sennop.replace(word, "what") + "?")
+        """if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
             # TODO instead of just using adjacent words, we can try using dependent words from a dependency tree
             # maybe we can use a wordnet to exchange X and Y for synonyms
             (X, X_pos) = POS[i-1]
@@ -54,15 +64,14 @@ if __name__ == '__main__':
                         questions.append("What is " + X + "?")
                         questions.append("What is " + Y + "?")
         ## TODO add more templates here, create template class
-
-    ### Grammar Parser
-
+"""
+    print(questions)
     ### Question Scorer
-    scores = questionscorer.scoreQuestions(questions)
+    """ scores = questionscorer.scoreQuestions(questions)
     sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score
     for i in range(0, numQs):
         if i >= len(sortedscores):
             print("no more questions")
             break
         (Q) = sortedscores[i]
-        print(Q+ '\n')
+        print(Q+ '\n')"""

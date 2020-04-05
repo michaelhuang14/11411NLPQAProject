@@ -16,6 +16,7 @@ if __name__ == '__main__':
                 if(y.label() != 'S'):
                     ners_set[i].append(y)
     answerlist = []
+
     for q in Questions:
         ques_sent = StringProcessor.tokenize(q)
         ques_ner = StringProcessor.NER(ques_sent)

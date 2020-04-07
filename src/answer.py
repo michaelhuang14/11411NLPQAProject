@@ -1,13 +1,16 @@
 import StringProcessor
-
+import sys
 Questions = ["What is Carnegie Mellon University?", "What did Carnegie Institute of Technology merge with in 1967?"]
 
 if __name__ == '__main__':
+    args = sys.argv
     with open('../data/data.txt', 'r') as file:
         data = file.read().replace('\n', ' ')
+    #with open(args[1], 'r') as file:
+    #    data = file.read().replace('\n', ' ')
     sentences = StringProcessor.sentence_tokenize(data)
     tok_sent = [StringProcessor.tokenize(x) for x in sentences]
-    ners_sent = [StringProcessor.NER(x) for x in tok_sent]
+    ners_sent = [StringProcessor.NER(x) for x in tok_sent] #not sure how this works
     ners_set = []
     for i in range(0,len(ners_sent)):
         ners_set.append([])
@@ -47,6 +50,7 @@ if __name__ == '__main__':
         cos_sims = [StringProcessor.match_similarity(ques_sent, tok_sent[i]) for i in goodq]
         index = cos_sims.index(max(cos_sims))
         answerlist.append(sentences[index])
+    #for i in range(0,)
     print(answerlist)
 
 

@@ -1,15 +1,17 @@
+#!/usr/bin/env python3
 import StringProcessor as sp
 from QuestionScorer import QuestionScorer
 import re
 import stanfordnlp
 #stanfordnlp.download('en')
+import sys
 
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
 
     nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
     doc = nlp(sentence)
-    #doc.sentences[0].print_dependencies()
+
     dependency = doc.sentences[0].dependencies_string()
     ret = []
     for line in dependency.split("\n"):
@@ -22,9 +24,14 @@ def find_keyword(sentence):
 
 if __name__ == '__main__':
     #nquestionscorer = QuestionScorer()
-    numQs = 1 # return top 5 questions
-    with open('../data/data.txt', 'r') as file:
+    args = sys.argv
+    numQs = int(args[2])#args[1] # return top numQ questions
+    #with open('../data/data.txt', 'r') as file:
+    #    data = file.read().replace('\n', ' ')
+    #print(sys.argv[1])
+    with open(args[1], 'r') as file:
         data = file.read().replace('\n', ' ')
+
     sentences = sp.sent_tokenize(data)
     # is there a way to trim all extra clauses from a sentence? for exapmle, remove things in between two commas,
     # remove things after semi-colons, etc.
@@ -33,6 +40,7 @@ if __name__ == '__main__':
     ### Template Matching
     for i in range(0, len(sentences)):
         importantwords = find_keyword(sentences[i])
+        print(importantwords)
         ner_tags = sp.NER(sp.tokenize(sentences[i]))
         sennop = sentences[i][0:len(sentences[i])-1]
         for (word, pos) in importantwords:
@@ -65,7 +73,11 @@ if __name__ == '__main__':
                         questions.append("What is " + Y + "?")
         ## TODO add more templates here, create template class
 """
-    print(questions)
+    for i in range(0, numQs):
+        if i < len(questions):
+            print(questions[i])
+        else:
+            print("no more questions")
     ### Question Scorer
     """ scores = questionscorer.scoreQuestions(questions)
     sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score

@@ -4,13 +4,15 @@ Questions = ["What is Carnegie Mellon University?", "What did Carnegie Institute
 
 if __name__ == '__main__':
     args = sys.argv
-    with open('../data/data.txt', 'r') as file:
+    with open(args[1], 'r') as file:
+        Questions = file.readlines()
+    with open(args[0], 'r') as file:
         data = file.read().replace('\n', ' ')
     #with open(args[1], 'r') as file:
     #    data = file.read().replace('\n', ' ')
     sentences = StringProcessor.sentence_tokenize(data)
     tok_sent = [StringProcessor.tokenize(x) for x in sentences]
-    ners_sent = [StringProcessor.NER(x) for x in tok_sent] #not sure how this works
+    ners_sent = [StringProcessor.old_NER(x) for x in tok_sent] #not sure how this works
     ners_set = []
     for i in range(0,len(ners_sent)):
         ners_set.append([])
@@ -22,7 +24,7 @@ if __name__ == '__main__':
 
     for q in Questions:
         ques_sent = StringProcessor.tokenize(q)
-        ques_ner = StringProcessor.NER(ques_sent)
+        ques_ner = StringProcessor.old_NER(ques_sent)
         qners = []
         for x in ques_ner.subtrees():
             for y in x.subtrees():

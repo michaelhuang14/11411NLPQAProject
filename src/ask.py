@@ -5,13 +5,12 @@ import re
 import stanfordnlp
 #stanfordnlp.download('en')
 import sys
-
+nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
 
-    nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
-    doc = nlp(sentence)
 
+    doc = nlp(sentence)
     dependency = doc.sentences[0].dependencies_string()
     ret = []
     for line in dependency.split("\n"):
@@ -40,17 +39,18 @@ if __name__ == '__main__':
     ### Template Matching
     for i in range(0, len(sentences)):
         importantwords = find_keyword(sentences[i])
-        print(importantwords)
+        #print(importantwords)
         ner_tags = sp.NER(sp.tokenize(sentences[i]))
         sennop = sentences[i][0:len(sentences[i])-1]
         for (word, pos) in importantwords:
-            if pos == "nsubj":
-                if ner_tags[word] == "B-PERSON":
-                    questions.append(sennop.replace(word, "Who")[0:len()])
-                elif ner_tags[word] == "B-GPE":
-                    questions.append(sennop.replace(word, "Where") + "?")
-                else:
-                    questions.append(sennop.replace(word, "what") + "?")
+            if word in ner_tags.keys():
+                if pos == "nsubj":
+                    if ner_tags[word] == "B-PERSON":
+                        questions.append(sennop.replace(word, "Who")+ "?")
+                    elif ner_tags[word] == "B-GPE":
+                        questions.append(sennop.replace(word, "Where") + "?")
+                    else:
+                        questions.append(sennop.replace(word, "what") + "?")
         """if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
             # TODO instead of just using adjacent words, we can try using dependent words from a dependency tree
             # maybe we can use a wordnet to exchange X and Y for synonyms

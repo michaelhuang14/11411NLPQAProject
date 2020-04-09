@@ -74,10 +74,7 @@ if __name__ == '__main__':
         ## TODO add more templates here, create template class
 """
     for i in range(0, numQs):
-        if i < len(questions):
-            print(questions[i])
-        else:
-            print("no more questions")
+        print(questions[i%len(questions)])
     ### Question Scorer
     """ scores = questionscorer.scoreQuestions(questions)
     sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score

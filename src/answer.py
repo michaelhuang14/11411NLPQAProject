@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import StringProcessor
 import sys
 Questions = ["What is Carnegie Mellon University?", "What did Carnegie Institute of Technology merge with in 1967?"]

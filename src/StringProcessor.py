@@ -2,10 +2,10 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.chunk import conlltags2tree, tree2conlltags
 import nltk
-nltk.download('punkt')
-nltk.download('maxent_ne_chunker')
-nltk.download('words')
-nltk.download('averaged_perceptron_tagger')
+nltk.download('punkt', quiet = True)
+nltk.download('maxent_ne_chunker', quiet = True)
+nltk.download('words', quiet = True)
+nltk.download('averaged_perceptron_tagger', quiet = True)
 
 # takes in a raw string and outputs a list of tokens
 def tokenize(string):

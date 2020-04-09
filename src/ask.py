@@ -77,7 +77,7 @@ if __name__ == '__main__':
         if i < len(questions):
             print(questions[i])
         else:
-            print("no more questions")
+            break
     ### Question Scorer
     """ scores = questionscorer.scoreQuestions(questions)
     sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score

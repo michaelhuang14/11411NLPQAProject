@@ -4,9 +4,9 @@ Questions = ["What is Carnegie Mellon University?", "What did Carnegie Institute
 
 if __name__ == '__main__':
     args = sys.argv
-    with open(args[1], 'r') as file:
+    with open(args[2], 'r') as file:
         Questions = file.readlines()
-    with open(args[0], 'r') as file:
+    with open(args[1], 'r') as file:
         data = file.read().replace('\n', ' ')
     #with open(args[1], 'r') as file:
     #    data = file.read().replace('\n', ' ')
@@ -53,7 +53,8 @@ if __name__ == '__main__':
         index = cos_sims.index(max(cos_sims))
         answerlist.append(sentences[index])
     #for i in range(0,)
-    print(answerlist)
+    for answer in answerlist:
+        print(answer)
 
 
 

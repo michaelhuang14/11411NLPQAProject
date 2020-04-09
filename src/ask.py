@@ -9,6 +9,7 @@ import stanfordnlp
 import sys
 text_trap = io.StringIO()
 sys.stdout = text_trap
+sys.stderr = text_trap
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]

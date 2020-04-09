@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 import StringProcessor as sp
+import io
+import sys
 from QuestionScorer import QuestionScorer
 import re
 import stanfordnlp
 #stanfordnlp.download('en')
 import sys
+text_trap = io.StringIO()
+sys.stdout = text_trap
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
-
-
     doc = nlp(sentence)
     dependency = doc.sentences[0].dependencies_string()
     ret = []
@@ -73,6 +75,8 @@ if __name__ == '__main__':
                         questions.append("What is " + Y + "?")
         ## TODO add more templates here, create template class
 """
+    sys.stdout = sys.__stdout__
+
     for i in range(0, numQs):
         print(questions[i%len(questions)])
     ### Question Scorer

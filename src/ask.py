@@ -5,12 +5,13 @@ import sys
 from QuestionScorer import QuestionScorer
 import re
 import stanfordnlp
+import YesNoGenerator
 #stanfordnlp.download('en')
 import sys
 text_trap = io.StringIO()
 sys.stdout = text_trap
 sys.stderr = text_trap
-nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
+#nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
     doc = nlp(sentence)
@@ -54,6 +55,13 @@ if __name__ == '__main__':
                         questions.append(sennop.replace(word, "Where") + "?")
                     else:
                         questions.append(sennop.replace(word, "what") + "?")
+
+        #Yes/no question maker
+        yesno = YesNoGenerator.GenerateYesNo(sp.tokenize(sentences[i]))
+        if not (yesno==None):
+            questions.append(yesno)
+
+
         """if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
             # TODO instead of just using adjacent words, we can try using dependent words from a dependency tree
             # maybe we can use a wordnet to exchange X and Y for synonyms

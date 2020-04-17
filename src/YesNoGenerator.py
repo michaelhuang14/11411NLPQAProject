@@ -38,7 +38,7 @@ def GenerateYesNo(sentence):
         if not(i==isloc):
             out += (" "+sentence[i])
     return out + "?"
-
+"""
 print(GenerateYesNo(['Rose','is','red','.']))
 print(GenerateYesNo(['In','1998',',','Tom','was','11','years','old','.']))
 print(GenerateYesNo(sp.tokenize("If I can do a flip, I can drop the course.")))
@@ -47,7 +47,7 @@ print(GenerateYesNo(sp.tokenize("Dempsey was born in Nacogdoches, Texas, and, fo
                                 " where he and his siblings grew up playing soccer with Hispanic immigrants.")))
 print(GenerateYesNo(sp.tokenize("Given enough information, if I can do a flip, I can drop the course.")))
 
-
+"""
 
 
 

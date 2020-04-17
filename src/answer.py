@@ -9,8 +9,8 @@ if __name__ == '__main__':
         Questions = file.readlines()
     with open(args[1], 'r') as file:
         data = file.read().replace('\n', ' ')
-    #with open(args[1], 'r') as file:
-    #    data = file.read().replace('\n', ' ')
+    with open(args[1], 'r') as file:
+        data = file.read().replace('\n', ' ')
     sentences = StringProcessor.sentence_tokenize(data)
     tok_sent = [StringProcessor.tokenize(x) for x in sentences]
     ners_sent = [StringProcessor.old_NER(x) for x in tok_sent] #not sure how this works

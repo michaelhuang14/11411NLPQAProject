@@ -13,17 +13,34 @@ import sys
 #sys.stderr = text_trap
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
-
-    relation_list = ["nsubj", "obj", "" "nummod", "root", "compound", "advmod", "iobj", "amod", ]
+    nlp = stanfordnlp.Pipeline()
+    relation_list = ["nsubj", "obj", "" "nummod", "root", "advmod", "iobj", "amod", ]
     doc = nlp(sentence)
     dependency = doc.sentences[0].dependencies_string()
-    ret = []
+    parsed_list = []
     for line in dependency.split("\n"):
         # word, index, relation = re.split(r"\".*\"", line)
         line = line.replace("'", "")
         word, index, relation = re.findall(r"\((.*), (.*), (.*)\)", line)[0]
-        if relation in relation_list:
-            ret.append((word, relation))
+        index = int(index)-1
+        parsed_list.append([word, index, relation, []])
+    ret = []
+    for (i, l) in enumerate(parsed_list):
+        w, d, r, c = l[0], l[1], l[2], l[3]
+        if len(c) > 0:
+            c.append(i)
+        if r == "compound":
+            parsed_list[d][3].append(i)
+    for l in parsed_list:
+        w, r, c = l[0], l[2], l[3]
+        if len(c) > 0:
+            w = ""
+            for i in sorted(c):
+                w += parsed_list[i][0]
+                w += " "
+            w = w[:-1]
+        if r in relation_list:
+            ret.append((w, r))
     return ret
 
 def simplify_sentence(sent):

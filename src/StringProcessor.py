@@ -1,6 +1,8 @@
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.chunk import conlltags2tree, tree2conlltags
+import language_check
+lctool = language_check.LanguageTool('en-US')
 import nltk
 nltk.download('punkt', quiet = True)
 nltk.download('maxent_ne_chunker', quiet = True)
@@ -38,11 +40,28 @@ def match_similarity(sent1, sent2):
 def old_NER(sentence):
     return nltk.ne_chunk(pos_tag(sentence))
 
+#checks grammar, input full sentence string, returns true/false
+def grammar_check(sentence):
+    matches = lctool.check(sentence)
+    return len(matches)==0
+
+#auto-corrects grammar, does not always work
+def grammar_auto_correct(sentence):
+    return language_check.correct(sentence,lctool.check(sentence))
+
+def full_file_correct(file):
+    with open(file,'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            print(grammar_auto_correct(line))
+
+
 #sp = StringProcessor()
 if __name__ == "__main__":
-    sentence = "France is in paris is a student at CMU."
-    result = NER(tokenize(sentence))
-    print(result["France"])
+    #sentence = "France is in paris is a student at CMU."
+    #result = NER(tokenize(sentence))
+    #print(result["France"])
+    print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
 
 
 

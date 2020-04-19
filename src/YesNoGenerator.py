@@ -6,7 +6,6 @@ def inlist(a,l):
             return True
     return False
 
-
 def GenerateYesNo(sentence):
     startpos = 0
     isloc = -1
@@ -25,7 +24,7 @@ def GenerateYesNo(sentence):
                 startpos = i+1
             prevfirst = i + 1
         elif inlist(sentence[i],['is','was','are','were','can','could','should','must']):
-            if not inlist(sentence[i-1],['this','that','he','she', 'it','they']):
+            if not inlist(sentence[i-1],['this','that','he','she', 'it','they','and','so','or','either']):
                 if(isloc < 0):
                     isloc = i
     if(isloc < 0):

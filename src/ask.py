@@ -14,7 +14,7 @@ import sys
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     nlp = stanfordnlp.Pipeline()
-    relation_list = ["nsubj", "obj", "" "nummod", "root", "advmod", "iobj", "amod", ]
+    relation_list = ["nsubj", "obj", "" "nummod", "root", "advmod", "iobj", "amod"]
     doc = nlp(sentence)
     dependency = doc.sentences[0].dependencies_string()
     parsed_list = []

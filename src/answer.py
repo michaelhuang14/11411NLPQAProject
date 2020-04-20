@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
         #further filter by match similarity
         cos_sims = [StringProcessor.match_similarity(ques_sent, tok_sent[i]) for i in goodq]
-        index = cos_sims.index(max(cos_sims))
+        index = goodq[cos_sims.index(max(cos_sims))]
         ans_sent = sentences[index]
         answerlist.append(ans_sent)
 

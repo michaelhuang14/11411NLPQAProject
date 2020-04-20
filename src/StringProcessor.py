@@ -27,7 +27,7 @@ def sentence_tokenize(string):
     return sent_tokenize(string)
 def NERtree(sentence): #needed?
     return nltk.ne_chunk(pos_tag(sentence))
-def match_similarity(sent1, sent2):
+def match_similarity(sent2, sent1):
     map1 = {}
     for word in sent1:
         if word not in map1:

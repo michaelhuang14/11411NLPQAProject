@@ -108,7 +108,7 @@ if __name__ == '__main__':
         cos_sims = [StringProcessor.match_similarity(ques_sent, tok_sent[i]) for i in goodq]
         index = cos_sims.index(max(cos_sims))
         ans_sent = sentences[index]
-        # answerlist.append(ans_sent)
+        answerlist.append(ans_sent)
 
         q_dep = dependency_parse(q)
         ans_dep = dependency_parse(ans_sent)

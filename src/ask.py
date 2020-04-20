@@ -13,8 +13,8 @@ import sys
 #sys.stderr = text_trap
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
-    nlp = stanfordnlp.Pipeline()
-    relation_list = ["nsubj", "obj", "" "nummod", "root", "advmod", "iobj", "amod"]
+    #nlp = stanfordnlp.Pipeline()
+    relation_list = ["nsubj", "obj", "" "nummod", "root", "advmod", "iobj", "amod", ]
     doc = nlp(sentence)
     dependency = doc.sentences[0].dependencies_string()
     parsed_list = []
@@ -66,6 +66,13 @@ def simplify_sentence(sent):
         elif word == ';':
             return new_sent[0:i]
     return new_sent
+def find_first_conjunction(question):
+    list_of_conjunctions = [", and", ", but"]
+    for conj in list_of_conjunctions:
+        idx = question.find(conj)
+        if idx > 0:
+            return question[0:idx]
+    return question
 
 if __name__ == '__main__':
 
@@ -83,11 +90,9 @@ if __name__ == '__main__':
     #    data = file.read().replace('\n', ' ')
 
     sentences = sp.sent_tokenize(data)
-    #print(len(sentences))
-    # is there a way to trim all extra clauses from a sentence? for exapmle, remove things in between two commas,
-    # remove things after semi-colons, etc.
     # POS key: https://medium.com/@gianpaul.r/tokenization-and-parts-of-speech-pos-tagging-in-pythons-nltk-library-2d30f70af13b
     questions = []
+    questionidx = 0
     ### Template Matching
     for i in range(0, len(sentences)):
         sent = sentences[i]
@@ -103,24 +108,60 @@ if __name__ == '__main__':
             verb = "blue"
             subj = "jogged"
             if word in ner_tags.keys():
+                pattern = " " + word + " "
                 if pos == "root":
                     verb = word
                 if pos == "nsubj":
                     subj = word
-                    if ner_tags[word] == "B-PERSON":
-                        questions.append(sennop.replace(word, "Who")+ "?")
-                    elif ner_tags[word] == "B-GPE":
-                        questions.append(sennop.replace(word, "Where") + "?")
-                    else:
-                        questions.append(sennop.replace(word, "what") + "?")
+                    if sennop.replace(pattern, " UNK ") != sennop:
+                        idx = sennop.find(pattern) + 1
+                        if ner_tags[word] == "B-PERSON":
+                            questionidx += 1
+                            question = sennop.replace(pattern, " who ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) +". " + question)
+                        elif ner_tags[word] == "B-GPE":
+                            questionidx += 1
+                            question = sennop.replace(pattern, " where ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) +". " + question)
+                        else:
+                            questionidx += 1
+                            print(word + ": " + pos + ": " + ner_tags[word])
+                            question = sennop.replace(pattern, " what ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question)+ "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) +". " + question)
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
-                    if ner_tags[word] == "B-PERSON":
-                        # if we have FST, we can say "who did subj verbroot?"
-                        questions.append(sennop.replace(word, "Who")+ "?")
-                    elif ner_tags[word] == "B-GPE":
-                        questions.append(sennop.replace(word, "Where") + "?")
-                    else:
-                        questions.append(sennop.replace(word, "what") + "?")
+                    if sennop.replace(pattern, " UNK ") != sennop:
+                        idx = sennop.find(pattern) + 1
+                        if ner_tags[word] == "B-PERSON":
+                            questionidx += 1
+                            question = sennop.replace(pattern, " who ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) + ". " + question)
+                        elif ner_tags[word] == "B-GPE":
+                            questionidx += 1
+                            question = sennop.replace(pattern, " where ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) + ". " + question)
+                        else:
+                            questionidx += 1
+                            print(word + ": " + pos + ": " + ner_tags[word])
+                            question = sennop.replace(pattern, " what ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(str(questionidx) + ". " + question)
                 if pos == "amod":
                     # get the word this modifies, need dependency tree thing for that
                     continue
@@ -130,36 +171,13 @@ if __name__ == '__main__':
         if not (yesno==None):
             questions.append(yesno)
 
+    sys.stdout = sys.__stdout__
 
-        """if word == 'is' and i > 0 and i < len(POS)-1: # Template for X is Y
-            # TODO instead of just using adjacent words, we can try using dependent words from a dependency tree
-            # maybe we can use a wordnet to exchange X and Y for synonyms
-            (X, X_pos) = POS[i-1]
-            (Y, Y_pos) = POS[i+1]
-            if Y_pos == 'JJ': # adjective
-                questions.append('What kind of ' + X + "?")
-            elif Y_pos == 'NN' or Y_pos == "NNS": # noun
-                questions.append('What is/are ' + X + "(s)?")
-            else:
-                if X_pos == "NNP": # proper noun
-                    X_NER = stringprocessor.BERT_NER(X)
-                    if X_NER == 'LOC':
-                        questions.append("Where is " + X + "?")
-                    elif X_NER == 'PNAME':
-                        questions.append("Who is " + X + "?")
-                    else:
-                        # add the questions anyway, if they are bad the scorer should filter them out
-                        questions.append("What is " + X + "?")
-                        questions.append("What is " + Y + "?")
-        ## TODO add more templates here, create template class
-"""
-    #sys.stdout = sys.__stdout__
-
-    for i in range(0, numQs):
+    for i in range(0, len(questions)):
         print(questions[i % len(questions)])
     ### Question Scorer
-    scores = zip(questions, questionscorer.scoreQuestions(questions))
-    print(scores)
+    #scores = zip(questions, questionscorer.scoreQuestions(questions))
+    #print(scores)
     #sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score
     #for i in range(0, numQs):
     #    print(questions[i % len(questions)])

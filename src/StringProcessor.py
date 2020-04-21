@@ -66,7 +66,8 @@ if __name__ == "__main__":
     #sentence = "France is in paris is a student at CMU."
     #result = NER(tokenize(sentence))
     #print(result["France"])
-    #print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
+    print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
     print(dictionarylookup("Dempsey"))
+    print(grammar_check("When Dempsey played football, did he fall?"))
 
 

@@ -100,6 +100,8 @@ if __name__ == '__main__':
         sent_tok = simplify_sentence(sp.tokenize(sent))
         #print(sent_tok)
         sent_tok_string = " ".join(sent_tok)
+        if sent_tok_string == None or len(sent_tok_string) < 1:
+            continue
         importantwords = find_keyword(sent_tok_string)
         #print(importantwords)
         ner_tags = sp.NER(sent_tok)
@@ -121,14 +123,21 @@ if __name__ == '__main__':
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) +". " + question)
+                                questions.append(question)
                         elif ner_tags[word] == "B-GPE":
                             questionidx += 1
                             question = sennop.replace(pattern, " where ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) +". " + question)
+                                questions.append(question)
+                        elif not sp.dictionarylookup(word):
+                            questionidx += 1
+                            question = sennop.replace(pattern, " who ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(question)
                         else:
                             questionidx += 1
                             print(word + ": " + pos + ": " + ner_tags[word])
@@ -136,7 +145,7 @@ if __name__ == '__main__':
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question)+ "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) +". " + question)
+                                questions.append(question)
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
@@ -146,14 +155,21 @@ if __name__ == '__main__':
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) + ". " + question)
+                                questions.append(question)
                         elif ner_tags[word] == "B-GPE":
                             questionidx += 1
                             question = sennop.replace(pattern, " where ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) + ". " + question)
+                                questions.append(question)
+                        elif not sp.dictionarylookup(word):
+                            questionidx += 1
+                            question = sennop.replace(pattern, " who ")
+                            question = question[idx:len(question)]
+                            question = find_first_conjunction(question) + "?"
+                            if len(question.split()) >= 4:
+                                questions.append(question)
                         else:
                             questionidx += 1
                             print(word + ": " + pos + ": " + ner_tags[word])
@@ -161,7 +177,7 @@ if __name__ == '__main__':
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
                             if len(question.split()) >= 4:
-                                questions.append(str(questionidx) + ". " + question)
+                                questions.append(question)
                 if pos == "amod":
                     # get the word this modifies, need dependency tree thing for that
                     continue
@@ -170,9 +186,16 @@ if __name__ == '__main__':
         yesno = YesNoGenerator.GenerateYesNo(sent_tok)
         if not (yesno==None):
             questions.append(yesno)
+    filteredquestions = []
+    for question in questions:
+        if sp.grammar_check(question):
+            filteredquestions.append(question)
 
     sys.stdout = sys.__stdout__
 
+    for i in range(0, len(filteredquestions)):
+        print(filteredquestions[i % len(filteredquestions)])
+    print("unfiltered: \n")
     for i in range(0, len(questions)):
         print(questions[i % len(questions)])
     ### Question Scorer

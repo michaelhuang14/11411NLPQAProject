@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set1/a1.txt', 'r') as file:
+    with open('../data/set3/a1.txt', 'r') as file:
         data = file.read().replace('\n', ' ')
     with open("../data/questiondataset.txt", 'r') as f:
         scorer_train_data = f.read().replace('\n', ' ')
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                     subj = word
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-                        if ner_tags[word] == "B-PERSON":
+                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
                             questionidx += 1
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]
@@ -140,7 +140,7 @@ if __name__ == '__main__':
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-                        if ner_tags[word] == "B-PERSON":
+                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
                             questionidx += 1
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]

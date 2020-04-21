@@ -9,6 +9,9 @@ nltk.download('maxent_ne_chunker', quiet = True)
 nltk.download('words', quiet = True)
 nltk.download('averaged_perceptron_tagger', quiet = True)
 
+with open('../data/words.txt', 'r') as file:
+    data_words = file.read().replace('\n', ' ')
+word_dict = data_words.split()
 # takes in a raw string and outputs a list of tokens
 def tokenize(string):
     return word_tokenize(string)
@@ -55,13 +58,15 @@ def full_file_correct(file):
         for line in lines:
             print(grammar_auto_correct(line))
 
+def dictionarylookup(word):
+    return word in word_dict
 
 #sp = StringProcessor()
 if __name__ == "__main__":
     #sentence = "France is in paris is a student at CMU."
     #result = NER(tokenize(sentence))
     #print(result["France"])
-    print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
-
+    #print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
+    print(dictionarylookup("Dempsey"))
 
 

@@ -43,7 +43,11 @@ def old_NER(sentence):
 #checks grammar, input full sentence string, returns true/false
 def grammar_check(sentence):
     matches = lctool.check(sentence)
-    return len(matches)==0
+    counts = 0
+    for match in matches:
+        if match.locqualityissuetype not in ['misspelling']:
+            counts += 1
+    return counts==0
 
 #auto-corrects grammar, does not always work
 def grammar_auto_correct(sentence):
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     #sentence = "France is in paris is a student at CMU."
     #result = NER(tokenize(sentence))
     #print(result["France"])
-    print(grammar_check('Between 2007 and 2012 ,is Dempsey played for Premier League team Fulham and the club\'s highest Premier League goalscorer of all time?'))
+    print(grammar_check('Where winning an award , as well as Dempsey receiving an award for his goal ?'))
 
 
 

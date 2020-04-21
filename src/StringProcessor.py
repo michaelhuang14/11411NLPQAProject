@@ -74,6 +74,14 @@ def coreference(string):
     doc = coref_pipe(string)
     return doc._.coref_resolved
 
+def coreference_resolve_doc(doc):
+    sentences = sent_tokenize(doc)
+    startidx = 3
+    for idx in range(startidx,len(sentences)):
+        dereferenced = coreference(" ".join(sentences[idx-startidx:idx]))
+        sentences[idx-startidx:idx] = sent_tokenize(dereferenced)
+    return " ".join(sentences)
+
 def dictionarylookup(word):
     return word in word_dict
 
@@ -83,5 +91,6 @@ if __name__ == "__main__":
     #result = NER(tokenize(sentence))
     #print(result["France"])
     print(grammar_check('Where winning an award , as well as Dempsey receiving an award for his goal ?'))
+    print(coreference("Michael has three homeworks due. He is very sad. John is done with his homework. He is happy."))
 
 

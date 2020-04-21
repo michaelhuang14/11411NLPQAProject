@@ -78,12 +78,15 @@ if __name__ == '__main__':
 
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set3/a1.txt', 'r') as file:
-        data = file.read().replace('\n', ' ')
+    with open('../data/set1/a1.txt', 'r') as file:
+        data = file.read()
+        resolved = sp.coreference(data)
+        #print(resolved)
+        data = resolved.replace('\n', ' ')
     with open("../data/questiondataset.txt", 'r') as f:
         scorer_train_data = f.read().replace('\n', ' ')
-    questionscorer = QuestionScorer(scorer_train_data)
-    test = QuestionScorer(data)
+    #questionscorer = QuestionScorer(scorer_train_data)
+    #test = QuestionScorer(data)
     numQs = 15
     #print(sys.argv[1])
     #with open(args[1], 'r') as file:
@@ -186,18 +189,40 @@ if __name__ == '__main__':
         yesno = YesNoGenerator.GenerateYesNo(sent_tok)
         if not (yesno==None):
             questions.append(yesno)
+
+
+    sys.stdout = sys.__stdout__
+
+    for i in range(0, len(questions)):
+        q = questions[i]
+        q = q.capitalize()
+        new_question = questions[i]
+        pattern = " 's"
+        q = q.replace(pattern, "'s")
+        pattern = " ' "
+        q = q.replace(pattern, "' ")
+        pattern = " ?"
+        q = q.replace(pattern, "?")
+        pattern = " ,"
+        q = q.replace(pattern, ",")
+        questions[i] = sp.grammar_auto_correct(q)
+
     filteredquestions = []
     for question in questions:
         if sp.grammar_check(question):
             filteredquestions.append(question)
-
-    sys.stdout = sys.__stdout__
-
-    for i in range(0, len(filteredquestions)):
-        print(filteredquestions[i % len(filteredquestions)])
-    print("unfiltered: \n")
+    #for i in range(0, len(filteredquestions)):
+    #    print(filteredquestions[i % len(filteredquestions)])
+    #print("corrected:\n")
+    #for i in range(0, len(correctedquestions)):
+    #    print(correctedquestions[i % len(correctedquestions)])
+    #print("unfiltered: \n")
     for i in range(0, len(questions)):
         print(questions[i % len(questions)])
+    print("filtered questions : \n")
+    for i in range(0, len(filteredquestions)):
+        print(filteredquestions[i % len(filteredquestions)])
+
     ### Question Scorer
     #scores = zip(questions, questionscorer.scoreQuestions(questions))
     #print(scores)

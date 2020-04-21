@@ -8,6 +8,12 @@ nltk.download('punkt', quiet = True)
 nltk.download('maxent_ne_chunker', quiet = True)
 nltk.download('words', quiet = True)
 nltk.download('averaged_perceptron_tagger', quiet = True)
+import spacy
+import neuralcoref
+# Installation of spacy and neuralcoref
+# pip install spacy==2.1.0 
+# pip install neuralcoref --no-binary neuralcoref
+# python -m spacy download en
 
 # takes in a raw string and outputs a list of tokens
 def tokenize(string):
@@ -54,6 +60,12 @@ def full_file_correct(file):
         lines = f.readlines()
         for line in lines:
             print(grammar_auto_correct(line))
+
+def coreference(string):
+    coref_pipe = spacy.load("en")
+    neuralcoref.add_to_pipe(coref_pipe)
+    doc = coref_pipe(string)
+    return doc._.coref_resolved
 
 
 #sp = StringProcessor()

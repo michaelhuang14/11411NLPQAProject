@@ -4,6 +4,7 @@ import sys
 import stanfordnlp
 import re
 import io
+
 Questions = ["Between 2007 and 2012 , who played for Premier League team Fulham and is the club 's highest Premier League goalscorer of all time?", "Is Dempsey of Irish descent on his father 's side?"]
 wh_set = {"who", "what", "which"}
 yes_no_set = {"is", "was", "are", "were"}
@@ -57,6 +58,8 @@ if __name__ == '__main__':
         Questions = file.readlines()
     with open(args[1], 'r') as file:
         data = file.read().replace('\n', ' ')
+    
+    data = StringProcessor.coreference(data)
     sentences = StringProcessor.sentence_tokenize(data)
     tok_sent = [StringProcessor.tokenize(x) for x in sentences]
     ners_sent = [StringProcessor.old_NER(x) for x in tok_sent] #not sure how this works
@@ -108,18 +111,19 @@ if __name__ == '__main__':
         cos_sims = [StringProcessor.match_similarity(ques_sent, tok_sent[i]) for i in goodq]
         index = goodq[cos_sims.index(max(cos_sims))]
         ans_sent = sentences[index]
-        answerlist.append(ans_sent)
 
         q_dep = dependency_parse(q)
         ans_dep = dependency_parse(ans_sent)
         dep = None
-        if not yes_no1:
+        if not yes_no1 and not yes_no2:
+            ans = []
             for (w, d) in q_dep:
                 if w.lower() in wh_set:
                     dep = d
             for (w, d) in ans_dep:
-                if d == dep:
-                    answerlist.append(w)
+                if d == dep and w not in wh_set:
+                    ans.append(w.lower())
+            answerlist.append(" ".join(ans) + ".")
         else:
             ans = match_yes_no_parts(q_dep, ans_dep)
             answerlist.append(ans)

@@ -8,6 +8,7 @@ import stanfordnlp
 import YesNoGenerator
 #stanfordnlp.download('en')
 import sys
+import pickle
 #text_trap = io.StringIO()
 #sys.stdout = text_trap
 #sys.stderr = text_trap
@@ -42,7 +43,8 @@ def find_keyword(sentence):
         if r in relation_list:
             ret.append((w, r))
     return ret
-
+def length_filter(question):
+    return len(question.split()) >= 5
 def simplify_sentence(sent):
     leftcomma = -1
     leftparens = -2
@@ -78,15 +80,16 @@ if __name__ == '__main__':
 
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set1/a1.txt', 'r') as file:
+    with open('../data/set3/a1.txt', 'r') as file:
         data = file.read()
-        resolved = sp.coreference(data)
+        #resolved = sp.coreference(data)
         #print(resolved)
-        data = resolved.replace('\n', ' ')
-    with open("../data/questiondataset.txt", 'r') as f:
-        scorer_train_data = f.read().replace('\n', ' ')
+        data = data.replace('\n', ' ')
+    #with open("../data/questiondataset.txt", 'r') as f:
+    #    scorer_train_data = f.read().replace('\n', ' ')
     #questionscorer = QuestionScorer(scorer_train_data)
     #test = QuestionScorer(data)
+    qs = pickle.load(open("../data/n-gram_scorer.p", "rb"))
     numQs = 15
     #print(sys.argv[1])
     #with open(args[1], 'r') as file:
@@ -125,30 +128,26 @@ if __name__ == '__main__':
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         elif ner_tags[word] == "B-GPE":
                             questionidx += 1
                             question = sennop.replace(pattern, " where ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         elif not sp.dictionarylookup(word):
                             questionidx += 1
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         else:
                             questionidx += 1
                             print(word + ": " + pos + ": " + ner_tags[word])
                             question = sennop.replace(pattern, " what ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question)+ "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
@@ -157,30 +156,26 @@ if __name__ == '__main__':
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         elif ner_tags[word] == "B-GPE":
                             questionidx += 1
                             question = sennop.replace(pattern, " where ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         elif not sp.dictionarylookup(word):
                             questionidx += 1
                             question = sennop.replace(pattern, " who ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                         else:
                             questionidx += 1
                             print(word + ": " + pos + ": " + ner_tags[word])
                             question = sennop.replace(pattern, " what ")
                             question = question[idx:len(question)]
                             question = find_first_conjunction(question) + "?"
-                            if len(question.split()) >= 4:
-                                questions.append(question)
+
                 if pos == "amod":
                     # get the word this modifies, need dependency tree thing for that
                     continue
@@ -192,7 +187,7 @@ if __name__ == '__main__':
 
 
     sys.stdout = sys.__stdout__
-
+    questions = list(filter(length_filter, questions))
     for i in range(0, len(questions)):
         q = questions[i]
         q = q.capitalize()
@@ -217,12 +212,16 @@ if __name__ == '__main__':
     #for i in range(0, len(correctedquestions)):
     #    print(correctedquestions[i % len(correctedquestions)])
     #print("unfiltered: \n")
-    for i in range(0, len(questions)):
-        print(questions[i % len(questions)])
-    print("filtered questions : \n")
+    #for i in range(0, len(questions)):
+    #    print(questions[i % len(questions)])
+    #print("filtered questions : \n")
     for i in range(0, len(filteredquestions)):
         print(filteredquestions[i % len(filteredquestions)])
-
+    scores = zip(questions, qs.scoreQuestions(questions))
+    res = sorted(scores, key=lambda x: x[1])
+    for i in range(0, len(res)):
+        (q, s) = res[i]
+        print(q + ": " + str(s))
     ### Question Scorer
     #scores = zip(questions, questionscorer.scoreQuestions(questions))
     #print(scores)

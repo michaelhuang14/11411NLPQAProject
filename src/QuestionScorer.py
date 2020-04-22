@@ -2,6 +2,7 @@ import json
 from StringProcessor import *
 from nltk.lm import Vocabulary
 from nltk.lm import Lidstone
+import pickle
 from nltk.lm.preprocessing import pad_both_ends, padded_everygram_pipeline
 class QuestionScorer:
     def __init__(self, trainstring, n=2):
@@ -33,6 +34,13 @@ class QuestionScorer:
             #print("MLE Estimates:", [((ngram[-1], ngram[:-1]), self.lm.unmasked_score(ngram[-1], ngram[:-1])) for ngram in test])
         return results
 
+if __name__ == "__main__":
+    with open("../data/questiondataset.txt", 'r') as f:
+        data = f.read().replace('\n', ' ')
+    #qs = QuestionScorer(data)
+    #pickle.dump(qs, open("n-gram_scorer.p", "wb"))
+    qs = pickle.load(open("../data/n-gram_scorer.p", "rb"))
+    print(qs.scoreQuestions(["Why is the sky blue?", "blue blue?", "Why you am alive?", "why you not correct?", "what is latin for lion?", "who killed kennedy?", "Where is the great wall of china?" ]))
 #print(test.scoreQuestions(["blah blah blah?", "what effect on other matter allows electromagnetic radiation to be visible?"]))
 """
 with open('../data/train-v2.0.json', 'r') as f:

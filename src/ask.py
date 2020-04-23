@@ -93,12 +93,10 @@ if __name__ == '__main__':
     start = time.time()
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set1/a1.txt', 'r') as file:
+    with open('../data/set5/a3.txt', 'r') as file:
         data = file.read()
     with open("../data/questiondataset.txt", 'r') as f:
         scorer_train_data = f.read()
-    #qs = QuestionScorer(scorer_train_data)
-    #test = QuestionScorer(data)
     qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
     numQs = 10
     #print(sys.argv[1])

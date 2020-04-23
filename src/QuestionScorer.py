@@ -57,15 +57,15 @@ if __name__ == "__main__":
                 tempdata = f.read().replace('\n', ' ')
             print("set3: " + tempdata)
             data = data + tempdata
-    for file in os.listdir("../data/set4/"):
-        if file.endswith(".txt"):
-            with open("../data/set4/" + file, "r") as f:
-                tempdata = f.read().replace('\n', ' ')
-            print("set4: " + tempdata)
-            data = data + tempdata
+    #for file in os.listdir("../data/set4/"):
+    #    if file.endswith(".txt"):
+    #        with open("../data/set4/" + file, "r") as f:
+    #            tempdata = f.read().replace('\n', ' ')
+    #        print("set4: " + tempdata)
+    #        data = data + tempdata
     #print(data)
     qs = QuestionScorer(data)
-    pickle.dump(qs, open("n-gram_scorer_large.p", "wb"))
+    pickle.dump(qs, open("n-gram_scorer_med.p", "wb"))
     #qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
     print(qs.scoreQuestions(["Why is the sky blue?", "blue blue?", "Why you am alive?", "why you not correct?", "what is latin for lion?", "who killed kennedy?", "Where is the great wall of china?" ]))
 #print(test.scoreQuestions(["blah blah blah?", "what effect on other matter allows electromagnetic radiation to be visible?"]))

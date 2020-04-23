@@ -10,9 +10,9 @@ import YesNoGenerator
 #stanfordnlp.download('en')
 import sys
 import pickle
-#text_trap = io.StringIO()
-#sys.stdout = text_trap
-#sys.stderr = text_trap
+text_trap = io.StringIO()
+sys.stdout = text_trap
+sys.stderr = text_trap
 nlp = stanfordnlp.Pipeline() # This sets up a default neural pipeline in English
 def find_keyword(sentence):
     #nlp = stanfordnlp.Pipeline()
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     start = time.time()
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set2/a1.txt', 'r') as file:
+    with open('../data/set4/a5.txt', 'r') as file:
         data = file.read()
         #resolved = sp.coreference(data)
         #print(resolved)
@@ -103,12 +103,14 @@ if __name__ == '__main__':
     #qs = QuestionScorer(scorer_train_data)
     #test = QuestionScorer(data)
     qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
-    numQs = 15
+    numQs = 10
     #print(sys.argv[1])
     #with open(args[1], 'r') as file:
     #    data = file.read().replace('\n', ' ')
 
     sentences = sp.sent_tokenize(data)
+    sent_rank = sp.rank_sentences(sentences)
+    #sentences = sent_rank
     # POS key: https://medium.com/@gianpaul.r/tokenization-and-parts-of-speech-pos-tagging-in-pythons-nltk-library-2d30f70af13b
     questions = []
     questionidx = 0
@@ -124,7 +126,8 @@ if __name__ == '__main__':
         importantwords = find_keyword(sent_tok_string)
         #print(importantwords)
         ner_tags = sp.NER(sent_tok)
-        sennop = sent_tok_string[0:len(sent_tok_string)-1]
+        sent_tok_string = sent_tok_string.strip()
+        sennop = sent_tok_string[0:len(sent_tok_string)]
         for (word, pos) in importantwords:
             verb = "blue"
             subj = "jogged"
@@ -136,12 +139,12 @@ if __name__ == '__main__':
                     subj = word
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
-                            question = sennop.replace(pattern, " who ")
+                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON" and word != "I":
+                            question = sennop.replace(pattern, " who ",1)
                         elif not sp.dictionarylookup(word):
-                            question = sennop.replace(pattern, " who ")
+                            question = sennop.replace(pattern, " who ", 1)
                         else:
-                            question = sennop.replace(pattern, " what ")
+                            question = sennop.replace(pattern, " what ", 1)
 
                         question = question[idx:len(question)]
                         question = find_first_conjunction(question) + "?"
@@ -150,49 +153,69 @@ if __name__ == '__main__':
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
-                            question = sennop.replace(pattern, " who ")
+                        if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON" and word != "I":
+                            question = sennop.replace(pattern, " who ", 1)
                         elif not sp.dictionarylookup(word):
-                            question = sennop.replace(pattern, " who ")
+                            question = sennop.replace(pattern, " who ", 1)
                         else:
-                            question = sennop.replace(pattern, " what ")
+                            question = sennop.replace(pattern, " what ", 1)
                         question = question[idx:len(question)]
                         question = find_first_conjunction(question) + "?"
                         questions.append(question)
                 if pos == "amod":
                     # get the word this modifies, need dependency tree thing for that
                     continue
-
         #Yes/no question maker
         yesno = YesNoGenerator.GenerateYesNo(sent_tok)
         if not (yesno==None):
             questions.append(yesno)
+        if len(questions) > 5*numQs:
+            break
 
 
     sys.stdout = sys.__stdout__
     questions = list(filter(length_filter, questions))
     for i in range(0, len(questions)):
-        q = questions[i]
-        q = q[0].upper() + q[1:]
-        new_question = questions[i]
-        pattern = " 's"
-        q = q.replace(pattern, "'s")
-        pattern = " ' "
-        q = q.replace(pattern, "' ")
-        pattern = " ?"
-        q = q.replace(pattern, "?")
-        pattern = " ,"
-        q = q.replace(pattern, ",")
-        questions[i] = q
+        q = questions[i].strip()
+        bad_pattern = " the is "
+        if q.replace(bad_pattern, " UNK ") != q:
+            q = q.lower()
+            questions[i] = q
+        elif q.replace(" the in ", " UNK ") != q:
+            q = q.lower()
+            questions[i] = q
+        else:
+            q = q[0].upper() + q[1:]
+            pattern = " 's"
+            q = q.replace(pattern, "'s")
+            pattern = " ' "
+            q = q.replace(pattern, "' ")
+            pattern = " ?"
+            q = q.replace(pattern, "?")
+            pattern = ".?"
+            q = q.replace(pattern, "?")
+            pattern = " ,"
+            q = q.replace(pattern, ",")
+            pattern = ";?"
+            q = q.replace(pattern, "?")
+            if q[len(q)-2] == " ":
+                q = q[0:len(q)-2] + "?"
+            auto_correct = sp.grammar_auto_correct(q)
+            if auto_correct.lower() == q.lower():
+                questions[i] = auto_correct
+            else:
+                questions[i] = q
+
 
     filteredquestions = []
     for question in questions:
         if sp.grammar_check(question):
             filteredquestions.append(question)
-
+    filteredquestions = mylist = list(dict.fromkeys(filteredquestions))
+    """
     for i in range(0, len(filteredquestions)):
         print(filteredquestions[i % len(filteredquestions)])
-
+    """
     list1 = list(filter(length_filter_lower, filteredquestions))
     list2 = list(filter(length_filter_mid, filteredquestions))
     list3 = list(filter(length_filter_upper, filteredquestions))
@@ -201,7 +224,8 @@ if __name__ == '__main__':
     scores3 = list(zip(list3, qs.scoreQuestions(list3)))
     res1 = postproc_score(scores1)
     res2 = postproc_score(scores2)
-    res3 = postproc_score(scores2)
+    res3 = postproc_score(scores3)
+    """
     print("lowestlength: \n")
     for i in range(0, len(res1)):
         (q, s) = res1[i]
@@ -214,12 +238,50 @@ if __name__ == '__main__':
     for i in range(0, len(res3)):
         (q, s) = res3[i]
         print(q + ": " + str(s))
-
-
-    scores = list(zip(questions, qs.scoreQuestions(questions)))
-    res = postproc_score(scores)
-    for i in range(0, len(res)):
-        (q, s) = res[i]
-        print(q + ": " + str(s))
+    """
+    #1 2 1 dist
+    unit = numQs//4
+    finalquestions = []
+    for i in range(0, unit):
+        if i >= len(res1):
+            break
+        (q,s) = res1[i]
+        finalquestions.append(q)
+    for i in range(0, unit):
+        if i >= len(res3):
+            break
+        (q,s) = res3[i]
+        finalquestions.append(q)
+    i = 0
+    while len(finalquestions) < numQs:
+        if i >=len(res2):
+            break
+        else:
+            (q, s) = res2[i]
+            finalquestions.append(q)
+        i += 1
+    i = unit
+    """
+    # incase there are not enoufgh qs in mid length
+    while len(finalquestions) < numQs:
+        if i >=len(res1):
+            break
+        else:
+            (q, s) = res1[i]
+            finalquestions.append(q)
+        i += 1
+    i = unit
+    while len(finalquestions) < numQs:
+        if i >= len(res3): 
+            break
+        else:
+            (q, s) = res3[i]
+            finalquestions.append(q)
+        i += 1
+    """
+    sys.stdout = sys.__stdout__
+    for q in finalquestions:
+        print(q)
     end = time.time()
     print(end - start)
+

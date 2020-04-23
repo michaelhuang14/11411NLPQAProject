@@ -88,9 +88,9 @@ if __name__ == '__main__':
         data = data.replace('\n', ' ')
     with open("../data/questiondataset.txt", 'r') as f:
         scorer_train_data = f.read().replace('\n', ' ')
-    qs = QuestionScorer(scorer_train_data)
+    #qs = QuestionScorer(scorer_train_data)
     #test = QuestionScorer(data)
-    #qs = pickle.load(open("../data/n-gram_scorer.p", "rb"))
+    qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
     numQs = 15
     #print(sys.argv[1])
     #with open(args[1], 'r') as file:
@@ -186,19 +186,13 @@ if __name__ == '__main__':
     for question in questions:
         if sp.grammar_check(question):
             filteredquestions.append(question)
-    #for i in range(0, len(filteredquestions)):
-    #    print(filteredquestions[i % len(filteredquestions)])
-    #print("corrected:\n")
-    #for i in range(0, len(correctedquestions)):
-    #    print(correctedquestions[i % len(correctedquestions)])
-    #print("unfiltered: \n")
-    #for i in range(0, len(questions)):
-    #    print(questions[i % len(questions)])
-    #print("filtered questions : \n")
+
     for i in range(0, len(filteredquestions)):
         print(filteredquestions[i % len(filteredquestions)])
+
     scores = zip(questions, qs.scoreQuestions(questions))
     res = sorted(scores, key=lambda x: x[1])
+
     for i in range(0, len(res)):
         (q, s) = res[i]
         print(q + ": " + str(s))

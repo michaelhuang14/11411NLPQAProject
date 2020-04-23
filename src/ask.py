@@ -46,6 +46,12 @@ def find_keyword(sentence):
     return ret
 def length_filter(question):
     return len(question.split()) >= 5
+def length_filter_lower(question):
+    return len(question.split()) >= 6 and len(question.split()) < 11
+def length_filter_mid(question):
+    return len(question.split()) >= 11 and len(question.split()) <15
+def length_filter_upper(question):
+    return len(question.split()) >=15 and len(question.split()) < 21
 def simplify_sentence(sent):
     leftcomma = -1
     leftparens = -2
@@ -191,11 +197,12 @@ if __name__ == '__main__':
         print(filteredquestions[i % len(filteredquestions)])
 
     scores = zip(questions, qs.scoreQuestions(questions))
-    for i in range(0,len(scores)):
-        (question, score) = scores[i]
+    scorelist = list(scores)
+    for i in range(0,len(questions)):
+        (question, score) = scorelist[i]
         if question[1:].islower():
-            scores[i]=(question,score+10.0)
-    res = sorted(scores, key=lambda x: x[1])
+            scorelist[i]=(question,score+10.0)
+    res = sorted(scorelist, key=lambda x: x[1])
 
     for i in range(0, len(res)):
         (q, s) = res[i]

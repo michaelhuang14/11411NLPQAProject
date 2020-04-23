@@ -99,7 +99,7 @@ def rank_sentences(sentencelist):
             scores[i] += 100
         if not tokenizedlist[i][-1]=='.':
             scores[i] += 200
-        if '\n' in sentencelist[i]:
+        if '\n' in sentencelist[i] or '...' in sentencelist[i]:
             scores[i] += 200
         if scores[i] < 6:
             scores[i] += 20

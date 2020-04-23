@@ -33,6 +33,7 @@ def GenerateYesNo(sentence):
     if(isloc < 0) or (isloc - startpos > 9):
         return None
     out = ""
+    sentence[0] = sentence[0][0].lower()+sentence[0][1:]
     for i in range(0,startpos):
         out += (" "+sentence[i])
     out += sentence[isloc]

@@ -173,7 +173,7 @@ if __name__ == '__main__':
     questions = list(filter(length_filter, questions))
     for i in range(0, len(questions)):
         q = questions[i]
-        q = q.capitalize()
+        q = q[0].upper() + q[1:]
         new_question = questions[i]
         pattern = " 's"
         q = q.replace(pattern, "'s")

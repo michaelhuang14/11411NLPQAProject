@@ -8,8 +8,8 @@ nltk.download('punkt', quiet = True)
 nltk.download('maxent_ne_chunker', quiet = True)
 nltk.download('words', quiet = True)
 nltk.download('averaged_perceptron_tagger', quiet = True)
-#import spacy
-#import neuralcoref
+import spacy
+import neuralcoref
 # Installation of spacy and neuralcoref
 # pip install spacy==2.1.0 
 # pip install neuralcoref --no-binary neuralcoref
@@ -116,9 +116,15 @@ if __name__ == "__main__":
     #print(result["France"])
     #print(grammar_check('Where winning an award , as well as Dempsey receiving an award for his goal ?'))
     #print(coreference("Michael has three homeworks due. He is very sad. John is done with his homework. He is happy."))
-    with open("../data/set1/a1.txt",'r',encoding='utf8') as f:
-        a = f.read()
-        print(rank_sentences(sent_tokenize(a)))
+    #with open("../data/set1/a1.txt",'r',encoding='utf8') as f:
+        #a = f.read()
+        #print(rank_sentences(sent_tokenize(a)))
+    #print("did Leo eat yet?".capitalize())
+    q = "did Leo eat yet?"
+    q = q[0].upper()+q[1:]
+    print(q)
+
+
 
 
 

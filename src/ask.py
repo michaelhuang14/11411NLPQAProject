@@ -191,6 +191,10 @@ if __name__ == '__main__':
         print(filteredquestions[i % len(filteredquestions)])
 
     scores = zip(questions, qs.scoreQuestions(questions))
+    for i in range(0,len(scores)):
+        (question, score) = scores[i]
+        if question[1:].islower():
+            scores[i]=(question,score+10.0)
     res = sorted(scores, key=lambda x: x[1])
 
     for i in range(0, len(res)):

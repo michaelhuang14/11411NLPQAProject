@@ -7,6 +7,8 @@ def inlist(a,l):
     return False
 
 def GenerateYesNo(sentence):
+    if inlist(',',sentence) or inlist('and',sentence) or inlist('when',sentence):
+        return None
     startpos = 0
     isloc = -1
     endloc = len(sentence)-1

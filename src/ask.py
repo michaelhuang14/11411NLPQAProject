@@ -81,7 +81,7 @@ if __name__ == '__main__':
     start = time.time()
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set1/a1.txt', 'r') as file:
+    with open('../data/set3/a1.txt', 'r') as file:
         data = file.read()
         #resolved = sp.coreference(data)
         #print(resolved)

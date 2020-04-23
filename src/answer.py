@@ -6,7 +6,8 @@ import re
 import io
 
 Questions = ["Between 2007 and 2012 , who played for Premier League team Fulham and is the club 's highest Premier League goalscorer of all time?", "Is Dempsey of Irish descent on his father 's side?"]
-wh_set = {"who", "what", "which"}
+wh_set = {"who", "what", "which", "where"}
+non_d_set = {"who", "what", "which", "where", "when", "that"}
 yes_no_set = {"is", "was", "are", "were"}
 yes_no_check = relation_list = {"nsubj", "obj", "nummod", "iobj", "nsubj_pass"}
 
@@ -29,22 +30,22 @@ def dependency_parse(sentence):
         if r == "compound":
             parsed_list[d][3].append(i)
     for l in parsed_list:
-        w, r, c = l[0], l[2], l[3]
+        w, i, r, c = l[0], l[1], l[2], l[3]
         if len(c) > 0:
             w = ""
             for i in sorted(c):
                 w += parsed_list[i][0]
                 w += " "
             w = w[:-1]
-        ret.append((w, r))
+        ret.append((w, i, r))
     return ret
 
 def match_yes_no_parts(q_dep, ans_dep):
     ans = "Yes"
-    for (w, d) in q_dep:
+    for (w, _, d) in q_dep:
         if d in yes_no_check:
             found = False
-            for (a, b) in ans_dep:
+            for (a, _, b) in ans_dep:
                 if b == d:
                     if a.lower() == w.lower():
                         found = True
@@ -116,15 +117,23 @@ if __name__ == '__main__':
 
         q_dep = dependency_parse(q)
         ans_dep = dependency_parse(ans_sent)
+        print(q_dep)
         ans_dep2 = dependency_parse(ans_sent2)
         dep = None
+        root = None
         if not yes_no1 and not yes_no2:
             ans = []
-            for (w, d) in q_dep:
+            for (w, i, d) in q_dep:
                 if w.lower() in wh_set:
-                    dep = d
-            for (w, d) in ans_dep:
-                if d == dep and w not in wh_set:
+                    if d == "root":
+                        dep = "nsubj"
+                    else:
+                        dep = d
+                elif d == "nsubj" or d == "root":
+                    root = w.lower()
+            answerlist.append(ans_dep)
+            for (w, i, d) in ans_dep:
+                if d == dep and ans_dep[i][0] == root: #and w not in non_d_set 
                     ans.append(w.lower())
             answerlist.append(" ".join(ans) + ".")
         else:

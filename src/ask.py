@@ -93,7 +93,7 @@ if __name__ == '__main__':
     start = time.time()
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set5/a1.txt', 'r') as file:
+    with open('../data/set1/a1.txt', 'r') as file:
         data = file.read()
     with open("../data/questiondataset.txt", 'r') as f:
         scorer_train_data = f.read()
@@ -136,10 +136,10 @@ if __name__ == '__main__':
                     subj = word
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-
+                        whoquest = False
                         if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON" and word != "I":
                             question = sennop.replace(pattern, " who ",1)
-
+                            whoquest = True
                         elif not sp.dictionarylookup(word):
                             question = sennop.replace(pattern, " who ", 1)
                         else:
@@ -147,23 +147,31 @@ if __name__ == '__main__':
 
                         question = question[idx:len(question)]
                         question = find_first_conjunction(question) + "?"
-
+                        if whoquest:
+                            words = question.split()
+                            if len(words) > 2 and not sp.dictionarylookup(words[1]):
+                                del words[1]
+                                question = " ".join(words).strip()
                         questions.append(question)
 
                 if pos == "obj" and verb!= "blue" and subj != "jogged":
                     if sennop.replace(pattern, " UNK ") != sennop:
                         idx = sennop.find(pattern) + 1
-
+                        whoquest =False
                         if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON" and word != "I":
                             question = sennop.replace(pattern, " who ", 1)
-
+                            whoquest = True
                         elif not sp.dictionarylookup(word):
                             question = sennop.replace(pattern, " who ", 1)
                         else:
                             question = sennop.replace(pattern, " what ", 1)
                         question = question[idx:len(question)]
                         question = find_first_conjunction(question) + "?"
-
+                        if whoquest:
+                            words = question.split()
+                            if len(words) > 2 and not sp.dictionarylookup(words[1]):
+                                del words[1]
+                                question = " ".join(words).strip()
                         questions.append(question)
                 if pos == "amod":
                     # get the word this modifies, need dependency tree thing for that

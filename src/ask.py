@@ -83,7 +83,7 @@ def find_first_conjunction(question):
             return question[0:idx]
     return question
 def postproc_score(scores):
-    for i in range(0,len(questions)):
+    for i in range(0,len(scores)):
         (question, score) = scores[i]
         if question[1:].islower():
             scores[i]=(question,score+10.0)
@@ -138,9 +138,6 @@ if __name__ == '__main__':
                         idx = sennop.find(pattern) + 1
                         if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
                             question = sennop.replace(pattern, " who ")
-                        elif (ner_tags[word] == "B-GPE" or ner_tags[word] == "I-GPE" or
-                             ner_tags[word] == "B-LOCATION" or  ner_tags[word] == "I-LOCATION") :
-                            question = sennop.replace(pattern, " where ")
                         elif not sp.dictionarylookup(word):
                             question = sennop.replace(pattern, " who ")
                         else:
@@ -155,14 +152,8 @@ if __name__ == '__main__':
                         idx = sennop.find(pattern) + 1
                         if ner_tags[word] == "B-PERSON" or ner_tags[word] == "I-PERSON":
                             question = sennop.replace(pattern, " who ")
-
-                        elif (ner_tags[word] == "B-GPE" or ner_tags[word] == "I-GPE" or
-                             ner_tags[word] == "B-LOCATION" or  ner_tags[word] == "I-LOCATION"):
-                            question = sennop.replace(pattern, " where ")
-
                         elif not sp.dictionarylookup(word):
                             question = sennop.replace(pattern, " who ")
-
                         else:
                             question = sennop.replace(pattern, " what ")
                         question = question[idx:len(question)]
@@ -192,7 +183,7 @@ if __name__ == '__main__':
         q = q.replace(pattern, "?")
         pattern = " ,"
         q = q.replace(pattern, ",")
-        questions[i] = sp.grammar_auto_correct(q)
+        questions[i] = q
 
     filteredquestions = []
     for question in questions:
@@ -201,7 +192,7 @@ if __name__ == '__main__':
 
     for i in range(0, len(filteredquestions)):
         print(filteredquestions[i % len(filteredquestions)])
-    """
+
     list1 = list(filter(length_filter_lower, filteredquestions))
     list2 = list(filter(length_filter_mid, filteredquestions))
     list3 = list(filter(length_filter_upper, filteredquestions))
@@ -211,7 +202,19 @@ if __name__ == '__main__':
     res1 = postproc_score(scores1)
     res2 = postproc_score(scores2)
     res3 = postproc_score(scores2)
-    """
+    print("lowestlength: \n")
+    for i in range(0, len(res1)):
+        (q, s) = res1[i]
+        print(q + ": " + str(s))
+    print("midlength: \n")
+    for i in range(0, len(res2)):
+        (q, s) = res2[i]
+        print(q + ": " + str(s))
+    print("highlength: \n")
+    for i in range(0, len(res3)):
+        (q, s) = res3[i]
+        print(q + ": " + str(s))
+
 
     scores = list(zip(questions, qs.scoreQuestions(questions)))
     res = postproc_score(scores)

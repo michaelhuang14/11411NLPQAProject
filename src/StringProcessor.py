@@ -8,8 +8,8 @@ nltk.download('punkt', quiet = True)
 nltk.download('maxent_ne_chunker', quiet = True)
 nltk.download('words', quiet = True)
 nltk.download('averaged_perceptron_tagger', quiet = True)
-import spacy
-import neuralcoref
+#import spacy
+#import neuralcoref
 # Installation of spacy and neuralcoref
 # pip install spacy==2.1.0 
 # pip install neuralcoref --no-binary neuralcoref
@@ -85,12 +85,40 @@ def coreference_resolve_doc(doc):
 def dictionarylookup(word):
     return word in word_dict
 
+def rank_sentences(sentencelist):
+    tokenizedlist = [tokenize(x) for x in sentencelist]
+    scores = [len(x) for x in tokenizedlist]
+    for i in range(0,len(sentencelist)):
+        if ',' in tokenizedlist[i]:
+            scores[i] += 80
+        if 'and' in tokenizedlist[i]:
+            scores[i] += 40
+        if sentencelist[i][1:].islower():
+            scores[i] += 60
+        if tokenizedlist[i][0]=='On' or tokenizedlist[i][0]=='In':
+            scores[i] += 100
+        if not tokenizedlist[i][-1]=='.':
+            scores[i] += 200
+        if '\n' in sentencelist[i]:
+            scores[i] += 200
+        if scores[i] < 6:
+            scores[i] += 20
+    scores = zip(sentencelist, scores)
+    res = sorted(scores, key=lambda x: x[1])
+    return [x for (x,_) in res]
+
+
+
 #sp = StringProcessor()
 if __name__ == "__main__":
     #sentence = "France is in paris is a student at CMU."
     #result = NER(tokenize(sentence))
     #print(result["France"])
-    print(grammar_check('Where winning an award , as well as Dempsey receiving an award for his goal ?'))
-    print(coreference("Michael has three homeworks due. He is very sad. John is done with his homework. He is happy."))
+    #print(grammar_check('Where winning an award , as well as Dempsey receiving an award for his goal ?'))
+    #print(coreference("Michael has three homeworks due. He is very sad. John is done with his homework. He is happy."))
+    with open("../data/set1/a1.txt",'r',encoding='utf8') as f:
+        a = f.read()
+        print(rank_sentences(sent_tokenize(a)))
+
 
 

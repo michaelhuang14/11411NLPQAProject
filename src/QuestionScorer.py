@@ -2,6 +2,7 @@ import json
 from StringProcessor import *
 from nltk.lm import Vocabulary
 from nltk.lm import Lidstone
+import os
 import pickle
 from nltk.lm.preprocessing import pad_both_ends, padded_everygram_pipeline
 class QuestionScorer:
@@ -35,11 +36,37 @@ class QuestionScorer:
         return results
 
 if __name__ == "__main__":
+    print("hi")
     with open("../data/questiondataset.txt", 'r') as f:
         data = f.read().replace('\n', ' ')
-    #qs = QuestionScorer(data)
-    #pickle.dump(qs, open("n-gram_scorer.p", "wb"))
-    qs = pickle.load(open("../data/n-gram_scorer.p", "rb"))
+    for file in os.listdir("../data/set1/"):
+        if file.endswith(".txt"):
+            with open("../data/set1/" + file, "r") as f:
+                tempdata = f.read().replace('\n', ' ')
+            print("set1: " + tempdata)
+            data = data + tempdata
+    for file in os.listdir("../data/set2/"):
+        if file.endswith(".txt"):
+            with open("../data/set2/" + file, "r") as f:
+                tempdata = f.read().replace('\n', ' ')
+            print("set2: " + tempdata)
+            data = data + tempdata
+    for file in os.listdir("../data/set3/"):
+        if file.endswith(".txt"):
+            with open("../data/set3/" + file, "r") as f:
+                tempdata = f.read().replace('\n', ' ')
+            print("set3: " + tempdata)
+            data = data + tempdata
+    for file in os.listdir("../data/set4/"):
+        if file.endswith(".txt"):
+            with open("../data/set4/" + file, "r") as f:
+                tempdata = f.read().replace('\n', ' ')
+            print("set4: " + tempdata)
+            data = data + tempdata
+    #print(data)
+    qs = QuestionScorer(data)
+    pickle.dump(qs, open("n-gram_scorer_large.p", "wb"))
+    #qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
     print(qs.scoreQuestions(["Why is the sky blue?", "blue blue?", "Why you am alive?", "why you not correct?", "what is latin for lion?", "who killed kennedy?", "Where is the great wall of china?" ]))
 #print(test.scoreQuestions(["blah blah blah?", "what effect on other matter allows electromagnetic radiation to be visible?"]))
 """

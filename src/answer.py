@@ -59,6 +59,7 @@ if __name__ == '__main__':
     with open(args[1], 'r') as file:
         data = file.read().replace('\n', ' ')
     
+    sentences2 = StringProcessor.sent_tokenize(data)
     data = StringProcessor.coreference(data)
     sentences = StringProcessor.sentence_tokenize(data)
     tok_sent = [StringProcessor.tokenize(x) for x in sentences]
@@ -111,9 +112,11 @@ if __name__ == '__main__':
         cos_sims = [StringProcessor.match_similarity(ques_sent, tok_sent[i]) for i in goodq]
         index = goodq[cos_sims.index(max(cos_sims))]
         ans_sent = sentences[index]
+        ans_sent2 = sentences2[index]
 
         q_dep = dependency_parse(q)
         ans_dep = dependency_parse(ans_sent)
+        ans_dep2 = dependency_parse(ans_sent2)
         dep = None
         if not yes_no1 and not yes_no2:
             ans = []
@@ -125,7 +128,7 @@ if __name__ == '__main__':
                     ans.append(w.lower())
             answerlist.append(" ".join(ans) + ".")
         else:
-            ans = match_yes_no_parts(q_dep, ans_dep)
+            ans = match_yes_no_parts(q_dep, ans_dep2)
             answerlist.append(ans)
 
     #for i in range(0,)

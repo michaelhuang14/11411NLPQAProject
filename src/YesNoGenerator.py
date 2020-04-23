@@ -13,7 +13,7 @@ def GenerateYesNo(sentence):
     prevfirst = 0
     for i in range(0,len(sentence)):
         if sentence[i]==',':
-            if(isloc>=0):
+            if(isloc>=0) and (isloc < i-1):
                 if inlist(sentence[i+1],['and','or','not','so','although']):
                     endloc = i
                 elif (not inlist(sentence[i+1],['while','if'])) and inlist(sentence[prevfirst],['If','Since','Although','While','When','What','Whatever']):
@@ -21,13 +21,16 @@ def GenerateYesNo(sentence):
                     startpos = i+1
 
             else:
+                if(isloc==i-1):
+                    isloc = -1
+                    break
                 startpos = i+1
             prevfirst = i + 1
         elif inlist(sentence[i],['is','was','are','were','can','could','should','must']):
-            if not inlist(sentence[i-1],['this','that','he','she', 'it','they','and','so','or','either']):
+            if not inlist(sentence[i-1],['this','that','he','she', 'it','they','and','so','or','either','which','who','what','where']):
                 if(isloc < 0):
                     isloc = i
-    if(isloc < 0):
+    if(isloc < 0) or (isloc - startpos > 9):
         return None
     out = ""
     for i in range(0,startpos):

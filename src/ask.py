@@ -82,18 +82,24 @@ def find_first_conjunction(question):
         if idx > 0:
             return question[0:idx]
     return question
-
+def postproc_score(scores):
+    for i in range(0,len(questions)):
+        (question, score) = scores[i]
+        if question[1:].islower():
+            scores[i]=(question,score+10.0)
+    res = sorted(scores, key=lambda x: x[1])
+    return res
 if __name__ == '__main__':
     start = time.time()
     args = sys.argv
     #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set3/a1.txt', 'r') as file:
+    with open('../data/set2/a1.txt', 'r') as file:
         data = file.read()
         #resolved = sp.coreference(data)
         #print(resolved)
-        data = data.replace('\n', ' ')
+        data = data
     with open("../data/questiondataset.txt", 'r') as f:
-        scorer_train_data = f.read().replace('\n', ' ')
+        scorer_train_data = f.read()
     #qs = QuestionScorer(scorer_train_data)
     #test = QuestionScorer(data)
     qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
@@ -195,23 +201,22 @@ if __name__ == '__main__':
 
     for i in range(0, len(filteredquestions)):
         print(filteredquestions[i % len(filteredquestions)])
+    """
+    list1 = list(filter(length_filter_lower, filteredquestions))
+    list2 = list(filter(length_filter_mid, filteredquestions))
+    list3 = list(filter(length_filter_upper, filteredquestions))
+    scores1 =  list(zip(list1, qs.scoreQuestions(list1)))
+    scores2 = list(zip(list2, qs.scoreQuestions(list2)))
+    scores3 = list(zip(list3, qs.scoreQuestions(list3)))
+    res1 = postproc_score(scores1)
+    res2 = postproc_score(scores2)
+    res3 = postproc_score(scores2)
+    """
 
-    scores = zip(questions, qs.scoreQuestions(questions))
-    scorelist = list(scores)
-    for i in range(0,len(questions)):
-        (question, score) = scorelist[i]
-        if question[1:].islower():
-            scorelist[i]=(question,score+10.0)
-    res = sorted(scorelist, key=lambda x: x[1])
-
+    scores = list(zip(questions, qs.scoreQuestions(questions)))
+    res = postproc_score(scores)
     for i in range(0, len(res)):
         (q, s) = res[i]
         print(q + ": " + str(s))
     end = time.time()
     print(end - start)
-    ### Question Scorer
-    #scores = zip(questions, questionscorer.scoreQuestions(questions))
-    #print(scores)
-    #sortedscores = sorted(scores, key=lambda x: x[1]) # sort by score
-    #for i in range(0, numQs):
-    #    print(questions[i % len(questions)])

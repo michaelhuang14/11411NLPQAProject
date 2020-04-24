@@ -2,12 +2,12 @@ import StringProcessor as sp
 
 def inlist(a,l):
     for i in l:
-        if a.lower()==i.lower():
+        if a.lower()==i.lower() or a == i:
             return True
     return False
 
 def GenerateYesNo(sentence):
-    if inlist(',',sentence) or inlist('and',sentence) or inlist('when',sentence):
+    if inlist(',',sentence) or inlist('and',sentence) or inlist('when',sentence) or inlist('\"',sentence):
         return None
     startpos = 0
     isloc = -1
@@ -53,7 +53,7 @@ print(GenerateYesNo(sp.tokenize("Dempsey was born in Nacogdoches, Texas, and, fo
 print(GenerateYesNo(sp.tokenize("Given enough information, if I can do a flip, I can drop the course.")))
 
 """
-
+#print(GenerateYesNo(sp.tokenize("Once the choreograph is over, the dancers were panting.")))
 
 
 

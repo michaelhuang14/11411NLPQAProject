@@ -57,11 +57,15 @@ def simplify_sentence(sent):
     leftparens = -2
     leftparens1 = -2
     new_sent = []
+    alt_sentence = []
+    alt_sentence_set = False
     for i in range(0,len(sent)):
         word = sent[i]
         new_sent.append(word)
         if word == "," and leftcomma < 0:
             leftcomma = i
+            alt_sentence_set = True
+            alt_sentence = new_sent[0:i]
         elif word == "," and leftcomma > 0:
             new_sent = new_sent[0:leftcomma]
         elif word == "(" and leftparens < 0:
@@ -73,8 +77,14 @@ def simplify_sentence(sent):
         elif word == "]" and leftparens1 > 0:
             new_sent = new_sent[0:leftparens1]
         elif word == ';':
-            return new_sent[0:i]
-    return new_sent
+            if alt_sentence_set:
+                return (new_sent[0:i], alt_sentence)
+            else:
+                return (new_sent[0:i], new_sent[0:i])
+    if alt_sentence_set:
+        return (new_sent, alt_sentence)
+    else:
+        return (new_sent, new_sent)
 def find_first_conjunction(question):
     list_of_conjunctions = [", and", ", but"]
     for conj in list_of_conjunctions:
@@ -90,18 +100,13 @@ def postproc_score(scores):
     res = sorted(scores, key=lambda x: x[1])
     return res
 if __name__ == '__main__':
-    start = time.time()
     args = sys.argv
-    #numQs = int(args[2])#args[1] # return top numQ questions
-    with open('../data/set3/a5.txt', 'r') as file:
-        data = file.read().replace('\n', '. ')
-    #with open("../data/questiondataset.txt", 'r') as f:
-    #   scorer_train_data = f.read()
+    numQs = int(args[2])#args[1] # return top numQ questions
+    #with open('../data/set1/a5.txt', 'r') as file:
+    #    data = file.read().replace('\n', '. ')
     qs = pickle.load(open("../data/n-gram_scorer_large.p", "rb"))
-    numQs = 10
-    #print(sys.argv[1])
-    #with open(args[1], 'r') as file:
-    #    data = file.read()
+    with open(args[1], 'r') as file:
+        data = file.read().replace('\n', '. ')
 
     sentences = sp.sent_tokenize(data)
     sent_rank = sp.rank_sentences(sentences)
@@ -112,14 +117,11 @@ if __name__ == '__main__':
     ### Template Matching
     for i in range(0, len(sentences)):
         sent = sentences[i]
-        #print(sent)
-        sent_tok = simplify_sentence(sp.tokenize(sent))
-        #print(sent_tok)
+        (sent_tok, alt_sent) = simplify_sentence(sp.tokenize(sent))
         sent_tok_string = " ".join(sent_tok)
         if sent_tok_string == None or len(sent_tok_string) < 1:
             continue
         importantwords = find_keyword(sent_tok_string)
-        #print(importantwords)
         ner_tags = sp.NER(sent_tok)
         sent_tok_string = sent_tok_string.strip()
         sennop = sent_tok_string[0:len(sent_tok_string)]
@@ -175,7 +177,9 @@ if __name__ == '__main__':
                     # get the word this modifies, need dependency tree thing for that
                     continue
         #Yes/no question maker
-        yesno = YesNoGenerator.GenerateYesNo(sent_tok)
+        commaidx = sent_tok_string.find(", ")
+        cut_sent = sent_tok_string
+        yesno = YesNoGenerator.GenerateYesNo(alt_sent)
         if not (yesno==None):
             questions.append(yesno)
         if len(questions) > 5*numQs:
@@ -211,6 +215,8 @@ if __name__ == '__main__':
             q = q.replace(pattern, "?")
             pattern = ".?"
             q = q.replace(pattern, "?")
+            if q[len(q)-2] == ":":
+                q = q[0:len(q)-2] + "?"
             if q[len(q)-2] == " ":
                 q = q[0:len(q)-2] + "?"
             auto_correct = sp.grammar_auto_correct(q)
@@ -225,10 +231,6 @@ if __name__ == '__main__':
         if sp.grammar_check(question):
             filteredquestions.append(question)
     filteredquestions = mylist = list(dict.fromkeys(filteredquestions))
-    """
-    for i in range(0, len(filteredquestions)):
-        print(filteredquestions[i % len(filteredquestions)])
-    """
     list1 = list(filter(length_filter_lower, filteredquestions))
     list2 = list(filter(length_filter_mid, filteredquestions))
     list3 = list(filter(length_filter_upper, filteredquestions))
@@ -238,20 +240,6 @@ if __name__ == '__main__':
     res1 = postproc_score(scores1)
     res2 = postproc_score(scores2)
     res3 = postproc_score(scores3)
-    """
-    print("lowestlength: \n")
-    for i in range(0, len(res1)):
-        (q, s) = res1[i]
-        print(q + ": " + str(s))
-    print("midlength: \n")
-    for i in range(0, len(res2)):
-        (q, s) = res2[i]
-        print(q + ": " + str(s))
-    print("highlength: \n")
-    for i in range(0, len(res3)):
-        (q, s) = res3[i]
-        print(q + ": " + str(s))
-    """
     #1 2 1 dist
     unit = numQs//4
     finalquestions = []
@@ -274,8 +262,8 @@ if __name__ == '__main__':
             finalquestions.append(q)
         i += 1
     i = unit
-    """
-    # incase there are not enoufgh qs in mid length
+
+    # in case there are not enoufgh qs in mid length
     while len(finalquestions) < numQs:
         if i >=len(res1):
             break
@@ -291,10 +279,7 @@ if __name__ == '__main__':
             (q, s) = res3[i]
             finalquestions.append(q)
         i += 1
-    """
     sys.stdout = sys.__stdout__
     for q in finalquestions:
         print(q)
-    end = time.time()
-    print(end - start)
 

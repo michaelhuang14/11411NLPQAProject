@@ -4,6 +4,9 @@ import sys
 import stanfordnlp
 import re
 import io
+text_trap = io.StringIO()
+sys.stdout = text_trap
+sys.stderr = text_trap
 
 Questions = ["Between 2007 and 2012 , who played for Premier League team Fulham and is the club 's highest Premier League goalscorer of all time?", "Is Dempsey of Irish descent on his father 's side?"]
 wh_set = {"who", "what", "which", "where"}
@@ -131,7 +134,7 @@ if __name__ == '__main__':
                         dep = d
                 elif d == "nsubj" or d == "root":
                     root = w.lower()
-            answerlist.append(ans_dep)
+            # answerlist.append(ans_dep)
             for (w, i, d) in ans_dep:
                 if d == dep and w not in non_d_set: 
                     ans.append(w.lower())
@@ -140,6 +143,7 @@ if __name__ == '__main__':
             ans = match_yes_no_parts(q_dep, ans_dep2)
             answerlist.append(ans)
 
+    sys.stdout = sys.__stdout__
     #for i in range(0,)
     for answer in answerlist:
         print(answer)

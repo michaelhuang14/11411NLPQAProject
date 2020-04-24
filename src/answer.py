@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
         q_dep = dependency_parse(q)
         ans_dep = dependency_parse(ans_sent)
-        print(q_dep)
+        # print(q_dep)
         ans_dep2 = dependency_parse(ans_sent2)
         dep = None
         root = None
@@ -133,7 +133,7 @@ if __name__ == '__main__':
                     root = w.lower()
             answerlist.append(ans_dep)
             for (w, i, d) in ans_dep:
-                if d == dep and ans_dep[i][0] == root: #and w not in non_d_set 
+                if d == dep and w not in non_d_set: 
                     ans.append(w.lower())
             answerlist.append(" ".join(ans) + ".")
         else:
